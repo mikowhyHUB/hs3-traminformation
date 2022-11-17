@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 '''
 1. ściągnąć dane przez api
 2. potrzebujemy trzy informacje wyświetlane na tablicy: tramwaj, w jaką stronę jedzie, szacowany czas przyjazdu
@@ -13,3 +14,23 @@ import json
 url = requests.get(
     'https://ckan2.multimediagdansk.pl/departures?stopId=2030')
 data = json.loads(url.text)
+
+lst = [i['estimatedTime'][11:19].split(':') for i in data['departures']]
+# lst2 = [i[11:19].split(':') for i in lst]
+for i in lst:
+    for j in i:
+        print(j, end=',')
+
+# for i in data['departures']:
+#     print(i['estimatedTime'])
+'''
+jest ok:
+now = datetime.now().time() 
+test = ((now.hour * 60) - 60 + now.minute) * 60 + now.second
+'''
+
+# current_time = now.strftime("%H:%M:%S")
+# current_time.
+# test = current_time.split(':')
+# test = [int(i)for i in test]
+# for i in range(3):
