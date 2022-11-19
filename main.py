@@ -16,7 +16,7 @@ data_zajezdnia02 = json.loads(url2.text)
 
 
 def estimated_time(data_zajezdnia):
-    # little function to convert time
+    # function to convert time
     def converte_hrs_to_sec(time):
         return ((time[0] * 60) + time[1]) * 60 + time[2]
 
@@ -24,13 +24,13 @@ def estimated_time(data_zajezdnia):
     eta = [i['estimatedTime'][11:19].split(
         ':') for i in data_zajezdnia['departures']]
     eta = [[int(i) for i in eta] for eta in eta]
-    # converted ETA list in seconds
-    eta = [converte_hrs_to_sec(eta[i]) for i in range(0, len(eta))]
+    # converting ETA list to seconds
+    eta = list(map(converte_hrs_to_sec, eta))
     return eta
 
 
 def delay_time(data_zajezdnia):
-    eta = estimated_time(data_zajezdnia01)
+    eta = estimated_time(data_zajezdnia)
     # updating estimated time with delay data
     delay_list = [i['delayInSeconds'] for i in data_zajezdnia['departures']]
     eta_with_delay = []
@@ -45,8 +45,8 @@ def delay_time(data_zajezdnia):
     return sorted(eta_with_delay)
 
 
-def substracted_time():
-    eta_with_delay = delay_time(data_zajezdnia01)
+def substracted_time(data_zajezdnia):
+    eta_with_delay = delay_time(data_zajezdnia)
     # changing current time (-1hour) to seconds
     current_time = datetime.utcnow().time()
     converted_time = ((current_time.hour * 60) +
@@ -62,14 +62,23 @@ def substracted_time():
 
 
 def main():
-    zajezdnia01 = substracted_time()
-    zajezdnia02 = substracted_time()
+    zajezdnia01 = substracted_time(data_zajezdnia01)
+    zajezdnia02 = substracted_time(data_zajezdnia02)
 
     print(zajezdnia01)
     print(zajezdnia02)
+    zajezdnia01, zajezdnia02 = zip(*sorted(zip(zajezdnia01, zajezdnia02)))
+    test = list(zip(zajezdnia01, zajezdnia02))
+    print('zip', test)
+    test2 = map(lambda x, y: x+y, zajezdnia01, zajezdnia02)
+    print(list(test2))
+
+    # outcome = [(i['routeId'], i['headsign'], j)
+    #        for i, j in zip(data_zajezdnia02['departures'], eta_min)]
+    # print(tabulate(outcome))
 
 
 main()
-# outcome = [(i['routeId'], i['headsign'], j)
-#            for i, j in zip(data_zajezdnia02['departures'], eta_min)]
-# # print(tabulate(outcome))
+
+'''
+pomysł. a co jakby uzyc funkcji filter i stowrzyc funkcje co bedzie filtorwac oby dwa przystanki'''
