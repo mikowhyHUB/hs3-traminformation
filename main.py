@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 from tabulate import tabulate
+
 '''
 2. potrzebujemy trzy informacje wyświetlane na tablicy: tramwaj, w jaką stronę jedzie, szacowany czas przyjazdu 
 - gdy czas przyjazdu wynosić bedzie <1, wtedy jakąś ikonkę printować zamiast czasu
@@ -15,8 +16,8 @@ url1 = requests.get(
 data_zajezdnia02 = json.loads(url1.text)
 
 
-def converte_hrs_to_sec(item):
-    return ((item[0] * 60) + item[1]) * 60 + item[2]
+def converte_hrs_to_sec(time):
+    return ((time[0] * 60) + time[1]) * 60 + time[2]
 
 
 # prepering data from e.g: "2022-11-18T15:01:28Z"
@@ -25,33 +26,44 @@ eta = [i['estimatedTime'][11:19].split(':')
 eta = [[int(i) for i in eta] for eta in eta]
 # converted arrival estimated time list in seconds
 eta = [converte_hrs_to_sec(eta[i]) for i in range(0, len(eta))]
-print('w sek przed deley: ', eta)
+
+# print('w sek przed deley:  ', eta)
 # updating eta with delay data
 delay_list = [i['delayInSeconds']
               for i in data_zajezdnia02['departures']]
-print('jaki delay:       ', delay_list)
-after_delay = []
+# print('jaki delay:        ', delay_list)
+eta_with_delay = []
 for i, j in zip(delay_list, eta):
     if i != None:
         if i < 0:
-            after_delay.append(j + (-abs(i)))
+            eta_with_delay.append(j + (-abs(i)))
         else:
-            after_delay.append(j + (abs(i)))
+            eta_with_delay.append(j + (abs(i)))
     else:
-        after_delay.append(j)
-# print(' po delayu lista:', after_delay)
-after_delay = sorted(after_delay)
-# print('s po delayu lista:', after_delay)
+        eta_with_delay.append(j)
+# print('   po delayu lista:', eta_with_delay)
+eta_sorted = sorted(eta_with_delay)
+# print('sorted delayu lista:', eta_with_delay)
 
 
-current_time = datetime.now().time()
+current_time = datetime.utcnow().time()
+print(current_time)
 # changing current time to seconds
-converted_time = ((current_time.hour * 60) - 60 +
+converted_time = ((current_time.hour * 60) +
                   current_time.minute) * 60 + current_time.second
-# subtracting both data and converting to minutes
-lst = [round((i - converted_time)/60) for i in after_delay]
-outcome = [(i['routeId'], i['headsign'], j)
-           for i, j in zip(data_zajezdnia02['departures'], lst)]
-print(tabulate(outcome))
 
-# ''' do poprawy: pomimo dodania delay nie zgadza się z tablicą na stronie'''
+# test1 = [round((i - converted_time)/60) for i in eta]
+# print('Przed delay:     ', test1)
+# test3 = [round((i - converted_time)/60) for i in eta_with_delay]
+# print('Po delay         ', test3)
+# test2 = [round((i - converted_time)/60) for i in eta_sorted]
+# print('Po delay sorted: ', test2)
+
+# subtracting both data and converting to minutes
+eta_min = [round((i - converted_time)/60) for i in eta_sorted]
+for i in eta_min:
+    if i < 1:
+        eta_min[i] = '\U0001F68A'
+outcome = [(i['routeId'], i['headsign'], j)
+           for i, j in zip(data_zajezdnia02['departures'], eta_min)]
+print(tabulate(outcome))
