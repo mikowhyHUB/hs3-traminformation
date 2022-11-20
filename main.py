@@ -4,7 +4,6 @@ from datetime import datetime
 from tabulate import tabulate
 
 '''
-3. Jako, ze interesują nas tramwaje w obydwie storny, musimy połączyć dwa url
 4. Interesuje nas tylko np. 5 następnych tramwajów
 5. Znalźć sposób na samouruchamianie się terminala. Chodzi o to, by się na wyświetlaczu sam wywoływał i aktualizował'''
 
@@ -54,25 +53,27 @@ def substracted_time(data_zajezdnia):
     #         eta_min[i] = '\U0001F68A'
     return eta_min
 
+# todo: think I can do one func for those 3 above
 
-def test_eta(time01, time02):
+
+def table_eta(time01, time02):
+    # zipping two ETA lines directions
     eta = [(i, j) for i, j in zip(time01, time02)]
-    suum = list(sum(eta, ()))
-    return suum
+    return list(sum(eta, ()))
 
 
-def test_tramwaj(data01, data02):
-    nr_tram = [(i['routeId'], j['routeId'])
-               for i, j in zip(data01['departures'], data02['departures'])]
-    suum = list(sum(nr_tram, ()))
-    return suum
+def table_tram_nums(data01, data02):
+    # zipping two tram numbers lines directions
+    tram_nums = [(i['routeId'], j['routeId'])
+                 for i, j in zip(data01['departures'], data02['departures'])]
+    return list(sum(tram_nums, ()))
 
 
-def test_destynacja(data01, data02):
-    desty = [(i['headsign'], j['headsign'])
-             for i, j in zip(data01['departures'], data02['departures'])]
-    suum = list(sum(desty, ()))
-    return suum
+def table_headsigns(data01, data02):
+    # zipping two headsing lines directions
+    headsigns = [(i['headsign'], j['headsign'])
+                 for i, j in zip(data01['departures'], data02['departures'])]
+    return list(sum(headsigns, ()))
 
 
 def main():
@@ -83,23 +84,16 @@ def main():
     data_zajezdnia01 = json.loads(url1.text)
     data_zajezdnia02 = json.loads(url2.text)
 
-    zajezdnia01 = substracted_time(data_zajezdnia01)
-    zajezdnia02 = substracted_time(data_zajezdnia02)
-
-    nr = test_tramwaj(data_zajezdnia01, data_zajezdnia02)
-    desty = test_destynacja(data_zajezdnia01, data_zajezdnia02)
-    eta = test_eta(zajezdnia01, zajezdnia02)
-
-    test_outcome = [(i, j, k) for i, j, k in zip(nr, desty, eta)]
-    print(tabulate(test_outcome))
-    # print('01', zajezdnia01)
-    # print('02', zajezdnia02)
-
-    outcome = [(i['routeId'], i['headsign'], j)
-               for i, j in zip(data_zajezdnia02['departures'], zajezdnia02)]
-    # print(outcome)
-
-    # print(tabulate(outcome))
+    # preparing ETA table content
+    eta_zajezdnia01 = substracted_time(data_zajezdnia01)
+    eta_zajezdnia02 = substracted_time(data_zajezdnia02)
+    # table content
+    tram_nums = table_tram_nums(data_zajezdnia01, data_zajezdnia02)
+    headsigns = table_headsigns(data_zajezdnia01, data_zajezdnia02)
+    eta = table_eta(eta_zajezdnia01, eta_zajezdnia02)
+    # printing tram information table for both directions
+    outcome = [(i, j, k) for i, j, k in zip(tram_nums, headsigns, eta)]
+    print(tabulate(outcome))
 
 
 main()
