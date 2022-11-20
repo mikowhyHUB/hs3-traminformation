@@ -54,11 +54,25 @@ def substracted_time(data_zajezdnia):
     #         eta_min[i] = '\U0001F68A'
     return eta_min
 
-# nr tramwaju
+
+def test_eta(time01, time02):
+    eta = [(i, j) for i, j in zip(time01, time02)]
+    suum = list(sum(eta, ()))
+    return suum
 
 
-def test(data01, data02):
-    return
+def test_tramwaj(data01, data02):
+    nr_tram = [(i['routeId'], j['routeId'])
+               for i, j in zip(data01['departures'], data02['departures'])]
+    suum = list(sum(nr_tram, ()))
+    return suum
+
+
+def test_destynacja(data01, data02):
+    desty = [(i['headsign'], j['headsign'])
+             for i, j in zip(data01['departures'], data02['departures'])]
+    suum = list(sum(desty, ()))
+    return suum
 
 
 def main():
@@ -72,16 +86,20 @@ def main():
     zajezdnia01 = substracted_time(data_zajezdnia01)
     zajezdnia02 = substracted_time(data_zajezdnia02)
 
-    print('01', zajezdnia01)
-    print('02', zajezdnia02)
+    nr = test_tramwaj(data_zajezdnia01, data_zajezdnia02)
+    desty = test_destynacja(data_zajezdnia01, data_zajezdnia02)
+    eta = test_eta(zajezdnia01, zajezdnia02)
 
-    test = list(zip(zajezdnia01, zajezdnia02))
-    print('zip', test)  # tak nie da rady
+    test_outcome = [(i, j, k) for i, j, k in zip(nr, desty, eta)]
+    print(tabulate(test_outcome))
+    # print('01', zajezdnia01)
+    # print('02', zajezdnia02)
 
     outcome = [(i['routeId'], i['headsign'], j)
-               for i, j in zip(data_zajezdnia02['departures'], test)]
+               for i, j in zip(data_zajezdnia02['departures'], zajezdnia02)]
+    # print(outcome)
 
-    print(tabulate(outcome))
+    # print(tabulate(outcome))
 
 
 main()
