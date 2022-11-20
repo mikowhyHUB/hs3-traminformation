@@ -3,10 +3,6 @@ import json
 from datetime import datetime
 from tabulate import tabulate
 
-'''
-4. Interesuje nas tylko np. 5 następnych tramwajów
-5. Znalźć sposób na samouruchamianie się terminala. Chodzi o to, by się na wyświetlaczu sam wywoływał i aktualizował'''
-
 
 def estimated_time(data_zajezdnia):
     # function to convert time
@@ -47,10 +43,7 @@ def substracted_time(data_zajezdnia):
     # subtracting both data and converting to minutes
     eta_min = [round((i - converted_time)/60) for i in eta_with_delay]
     # replacing minutes with emoji when the estimated time is less than one minute
-    # for i in eta_min:
-    #     if i < 1:
-    #         # sometimes works, sometimes aint. To solve
-    #         eta_min[i] = '\U0001F68A'
+    eta_min = ['\U0001F68A' if i < 1 else i for i in eta_min]
     return eta_min
 
 # todo: think I can do one func for those 3 above
@@ -77,6 +70,7 @@ def table_headsigns(data01, data02):
 
 
 def main():
+    # api
     url1 = requests.get(
         'https://ckan2.multimediagdansk.pl/departures?stopId=2031')
     url2 = requests.get(
@@ -91,12 +85,14 @@ def main():
     tram_nums = table_tram_nums(data_zajezdnia01, data_zajezdnia02)
     headsigns = table_headsigns(data_zajezdnia01, data_zajezdnia02)
     eta = table_eta(eta_zajezdnia01, eta_zajezdnia02)
+
     # printing tram information table for both directions
     outcome = [(i, j, k) for i, j, k in zip(tram_nums, headsigns, eta)]
+    # choosing how many lines of data we want
+    outcome = [outcome[i] for i in range(5)]
+
     print(tabulate(outcome))
 
 
-main()
-
-'''
-pomysł. a co jakby uzyc funkcji filter i stowrzyc funkcje co bedzie filtorwac oby dwa przystanki'''
+if __name__ == '__main__':
+    main()
