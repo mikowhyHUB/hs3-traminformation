@@ -7,12 +7,6 @@ from tabulate import tabulate
 3. Jako, ze interesują nas tramwaje w obydwie storny, musimy połączyć dwa url
 4. Interesuje nas tylko np. 5 następnych tramwajów
 5. Znalźć sposób na samouruchamianie się terminala. Chodzi o to, by się na wyświetlaczu sam wywoływał i aktualizował'''
-url1 = requests.get(
-    'https://ckan2.multimediagdansk.pl/departures?stopId=2031')
-url2 = requests.get(
-    'https://ckan2.multimediagdansk.pl/departures?stopId=2030')
-data_zajezdnia01 = json.loads(url1.text)
-data_zajezdnia02 = json.loads(url2.text)
 
 
 def estimated_time(data_zajezdnia):
@@ -54,28 +48,40 @@ def substracted_time(data_zajezdnia):
     # subtracting both data and converting to minutes
     eta_min = [round((i - converted_time)/60) for i in eta_with_delay]
     # replacing minutes with emoji when the estimated time is less than one minute
-    for i in eta_min:
-        if i < 1:
-            # sometimes works, sometimes aint. To solve
-            eta_min[i] = '\U0001F68A'
+    # for i in eta_min:
+    #     if i < 1:
+    #         # sometimes works, sometimes aint. To solve
+    #         eta_min[i] = '\U0001F68A'
     return eta_min
+
+# nr tramwaju
+
+
+def test(data01, data02):
+    return
 
 
 def main():
+    url1 = requests.get(
+        'https://ckan2.multimediagdansk.pl/departures?stopId=2031')
+    url2 = requests.get(
+        'https://ckan2.multimediagdansk.pl/departures?stopId=2030')
+    data_zajezdnia01 = json.loads(url1.text)
+    data_zajezdnia02 = json.loads(url2.text)
+
     zajezdnia01 = substracted_time(data_zajezdnia01)
     zajezdnia02 = substracted_time(data_zajezdnia02)
 
-    print(zajezdnia01)
-    print(zajezdnia02)
-    zajezdnia01, zajezdnia02 = zip(*sorted(zip(zajezdnia01, zajezdnia02)))
-    test = list(zip(zajezdnia01, zajezdnia02))
-    print('zip', test)
-    test2 = map(lambda x, y: x+y, zajezdnia01, zajezdnia02)
-    print(list(test2))
+    print('01', zajezdnia01)
+    print('02', zajezdnia02)
 
-    # outcome = [(i['routeId'], i['headsign'], j)
-    #        for i, j in zip(data_zajezdnia02['departures'], eta_min)]
-    # print(tabulate(outcome))
+    test = list(zip(zajezdnia01, zajezdnia02))
+    print('zip', test)  # tak nie da rady
+
+    outcome = [(i['routeId'], i['headsign'], j)
+               for i, j in zip(data_zajezdnia02['departures'], test)]
+
+    print(tabulate(outcome))
 
 
 main()
