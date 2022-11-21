@@ -47,7 +47,6 @@ def eta_final(data_zajezdnia):
     return eta_min
 
 
-
 def table_tram_nums(data01, data02):
     # zipping two tram numbers lines directions
     tram_nums = [(i['routeId'], j['routeId'])
@@ -65,7 +64,7 @@ def table_headsigns(data01, data02):
 def table_eta(time01, time02):
     # zipping two ETA lines directions
     eta = [(i, j) for i, j in zip(time01, time02)]
-    return list(sum(eta, ()))    
+    return list(sum(eta, ()))
 
 
 def main():
@@ -87,10 +86,11 @@ def main():
 
     # printing tram information table for both directions
     outcome = [(i, j, k) for i, j, k in zip(tram_nums, headsigns, eta)]
+    # sorting by ETA
+    # outcome = sorted(outcome, key=lambda tup: tup[2]) - switched off for now, not working with emoji
     # printing n lines of data
     outcome = [outcome[i] for i in range(5)]
-
-    print(tabulate(outcome))
+    print(tabulate(outcome, tablefmt='simple', headers='  ', numalign='right'))
 
 
 if __name__ == '__main__':
