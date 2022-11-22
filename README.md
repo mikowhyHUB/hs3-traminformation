@@ -16,11 +16,11 @@ https://ckan.multimediagdansk.pl/dataset/tristar/resource/00fbcffa-5188-45be-b30
 ## Instructions
 1. Open this project in PlatformIO
 2. Run "pip3 install requirements.txt" command
-3. You can set other stops in Tricity with:
+3. You can set other stops in Tricity with(Default stops are: Zajezdnia 01 and Zajezdnia 02):
 - Choose the stop you want to be displayed('stopId') in [List of stops](https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/resource/4c4025f0-01bf-41f7-a39f-d156d201b82b/download/stops.json)
 - Replace stopId with the one you choose in def main() -> url1 or 2 -> 'https://ckan2...stopId=XXXX'
-4. Start the "main.py" file. You will need Python (works on Python 3.10.7)
-5. You will see an output while it works. The output refreshes on its own every 20sec(You can change it in the code execution).
+4. Start the "main.py" file. (Works on Python 3.10.7)
+5. You will see an output while it works. The output refreshes on its own every 20sec(You can change it in the code execution)
 6. To stop script, just press control + z 
 
 
@@ -31,7 +31,7 @@ https://ckan.multimediagdansk.pl/dataset/tristar/resource/00fbcffa-5188-45be-b30
 
 ## Contribution
 
-Big thanks to [DoomHammer](https://github.com/DoomHammer) for proposing me to do this project
+Big thanks to [DoomHammer](https://github.com/DoomHammer) for the chance to do this project.
 
 
 
