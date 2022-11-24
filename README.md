@@ -1,4 +1,4 @@
-# Tram Information for Hackespace Trójmiasto
+# Tram Information for Hackerspace Trójmiasto
 Real-time tracking of nearest trams next to headquarters of [Hackerspace Trójmiasto](https://github.com/hs3city) located in Gdańsk, Poland. 
 The project was written to be finally displayed on matrix monitors. The script takes data from the two closest stops going in two different directions of the city.
 
