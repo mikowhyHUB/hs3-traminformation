@@ -31,7 +31,9 @@ https://ckan.multimediagdansk.pl/dataset/tristar/resource/00fbcffa-5188-45be-b30
 
 ## Contribution
 
-Big thanks to [DoomHammer](https://github.com/DoomHammer) for the chance to do this project.
+Big thanks to:
+- [DoomHammer](https://github.com/DoomHammer) for the chance to do this project.
+- [Claude](https://github.com/reinhrst) for code review.
 
 
 
