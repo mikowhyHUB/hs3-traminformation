@@ -18,34 +18,30 @@ def converted_raw_eta(data_zajezdnia):
     return eta
 
 
-def eta_changed_delay(data_zajezdnia):
-    eta = converted_raw_eta(data_zajezdnia)
-    # updating estimated time with delay data
-    delay_list = [i['delayInSeconds'] for i in data_zajezdnia['departures']]
-    eta_with_delay = []
-    for i, j in zip(delay_list, eta):
-        if i != None:
-            if i < 0:
-                eta_with_delay.append(j + i)
-            else:
-                eta_with_delay.append(j + i)
-        else:
-            eta_with_delay.append(j)
-    return sorted(eta_with_delay)
-
-
-def abs(i):
-    return i if i >= 0 else -i
+# def eta_changed_delay(data_zajezdnia):
+#     eta = converted_raw_eta(data_zajezdnia)
+#     # updating estimated time with delay data
+#     delay_list = [i['delayInSeconds'] for i in data_zajezdnia['departures']]
+#     eta = []
+#     for i, j in zip(delay_list, eta):
+#         if i != None:
+#             if i < 0:
+#                 eta_with_delay.append(j + i)
+#             else:
+#                 eta_with_delay.append(j + i)
+#         else:
+#             eta_with_delay.append(j)
+#     return sorted(eta_with_delay)
 
 
 def eta_final(data_zajezdnia):
-    eta_with_delay = eta_changed_delay(data_zajezdnia)
+    eta = converted_raw_eta(data_zajezdnia)
     # changing current time (-1hour) to seconds
     current_time = datetime.utcnow().time()
     converted_time = ((current_time.hour * 60) +
                       current_time.minute) * 60 + current_time.second
     # subtracting both data and converting to minutes
-    eta_min = [round((i - converted_time)/60) for i in eta_with_delay]
+    eta_min = [round((i - converted_time)/60) for i in eta]
     # replacing minutes with emoji when the estimated time is less than one minute
     eta_min = ['\U0001F68A' if i < 1 else i for i in eta_min]
     return eta_min
@@ -90,8 +86,6 @@ def main():
 
     # printing tram information table for both directions
     outcome = [(i, j, k) for i, j, k in zip(tram_nums, headsigns, eta)]
-    # sorting by ETA
-    # outcome = sorted(outcome, key=lambda tup: tup[2]) - switched off for now, not working with emoji
     # printing n lines of data
     outcome = [outcome[i] for i in range(5)]
     print(tabulate(outcome, tablefmt='simple', headers='  ', numalign='right'))
