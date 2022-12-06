@@ -26,12 +26,16 @@ def eta_changed_delay(data_zajezdnia):
     for i, j in zip(delay_list, eta):
         if i != None:
             if i < 0:
-                eta_with_delay.append(j + (-abs(i)))
+                eta_with_delay.append(j + i)
             else:
-                eta_with_delay.append(j + (abs(i)))
+                eta_with_delay.append(j + i)
         else:
             eta_with_delay.append(j)
     return sorted(eta_with_delay)
+
+
+def abs(i):
+    return i if i >= 0 else -i
 
 
 def eta_final(data_zajezdnia):
