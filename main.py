@@ -1,117 +1,56 @@
 import requests
-import json
 import time
-from datetime import datetime
-from tabulate import tabulate
+import re
+import dataclasses
+import typing as t
+import datetime
+
+STOP_ID = [2031, 2030]
+ISO8601 = re.compile(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$")
+ICON = '\U0001F68A'  # icon is too wide
 
 
-def converted_raw_eta(data_zajezdnia):
-    '''
-    Converting raw api informations
-
-    :param data_zajezdnia: dict - all raw informations about stops and trams
-    :return: list - changing raw estimated time arrival to seconds
-    '''
-    def converte_hrs_to_sec(time):
-        '''
-        Converting hours to seconds
-
-        :param time: list - converted hours of local time to seconds
-        :return: list - converted time
-        '''
-        return ((time[0] * 60) + time[1]) * 60 + time[2]
-
-    eta = [i['estimatedTime'][11:19].split(
-        ':') for i in data_zajezdnia['departures']]
-    eta = [[int(i) for i in eta] for eta in eta]
-    eta = list(map(converte_hrs_to_sec, eta))
-    return eta
+def converting_to_datetime(date_str: str) -> datetime.datetime:
+    match = ISO8601.match(date_str)
+    assert (match)
+    return datetime.datetime(*map(int, match.groups()), tzinfo=datetime.timezone.utc)
 
 
-def eta_final(data_zajezdnia):
-    '''
-    Prepering time for final outcome. Replacing minutes with the tram emoji when the estimated time is less than one minute
+@dataclasses.dataclass(kw_only=True, frozen=True, order=True)
+class Trams:
+    eta: datetime.datetime
+    line_number: int
+    direction: str
 
-    :param data_zajezdnia: dict - all raw informations about stops and trams
-    :return: list - how many minutes left before the tram leaves
-    '''
-    eta = converted_raw_eta(data_zajezdnia)
-    current_time = datetime.utcnow().time()
-    converted_time = ((current_time.hour * 60) +
-                      current_time.minute) * 60 + current_time.second
-    # subtracting both data and converting to minutes
-    eta_min = [round((i - converted_time)/60) for i in eta]
-    # replacing <1 minute with tram emoji
-    eta_min = ['\U0001F68A' if i < 1 else i for i in eta_min]
-    return eta_min
+    def minutes_till_departure(self, now: datetime.datetime) -> int:
+        now = now or datetime.datetime.utcnow()
+        seconds = (self.eta - now).total_seconds()
+        return round(seconds / 60)
 
 
-def table_tram_nums(data01, data02):
-    '''
-    Zipping two tram numbers lines directions
-
-    :param data01:dict - all raw informations about tram stop Zajezdnia01
-    :param data02:dict - all raw informations about tram stop Zajezdnia02
-    :return: list - all the upcoming tram numbers for both directions
-    '''
-
-    tram_nums = [(i['routeId'], j['routeId'])
-                 for i, j in zip(data01['departures'], data02['departures'])]
-    return list(sum(tram_nums, ()))
-
-
-def table_headsigns(data01, data02):
-    '''
-    Zipping two headsign lines directions
-
-    :param data01:dict - all raw informations about tram stop Zajezdnia01
-    :param data02:dict - all raw informations about tram stop Zajezdnia02
-    :return: list - all the upcoming tram numbers for both directions
-    '''
-    headsigns = [(i['headsign'], j['headsign'])
-                 for i, j in zip(data01['departures'], data02['departures'])]
-    return list(sum(headsigns, ()))
-
-
-def table_eta(time01, time02):
-    '''
-    Taking from eta_final function parameters and zipping ETA lines directions
-
-    :param time01:list - time left in minutes for tram stop Zajezdnia01
-    :param time02:list - time left in minutes for tram stop Zajezdnia02
-    :return: list - all the ETA informations in minutes for both directions
-    '''
-    eta = [(i, j) for i, j in zip(time01, time02)]
-    return list(sum(eta, ()))
+def get_departures(stop_id: int) -> t.Sequence[Trams]:
+    response = requests.get(
+        f'https://ckan2.multimediagdansk.pl/departures?stopId={stop_id}')
+    data = response.json()
+    return [Trams(eta=converting_to_datetime(item["estimatedTime"]),
+                  line_number=item["routeId"],
+                  direction=item["headsign"])
+            for item in data["departures"]]
 
 
 def main():
-    # api
-    url1 = requests.get(
-        'https://ckan2.multimediagdansk.pl/departures?stopId=2031')
-    url2 = requests.get(
-        'https://ckan2.multimediagdansk.pl/departures?stopId=2030')
-    data_zajezdnia01 = json.loads(url1.text)
-    data_zajezdnia02 = json.loads(url2.text)
+    departures = sorted([departure for stop in STOP_ID for departure in get_departures(stop)])
 
-    # preparing ETA table content
-    eta_zajezdnia01 = eta_final(data_zajezdnia01)
-    eta_zajezdnia02 = eta_final(data_zajezdnia02)
-    # table content
-    tram_nums = table_tram_nums(data_zajezdnia01, data_zajezdnia02)
-    headsigns = table_headsigns(data_zajezdnia01, data_zajezdnia02)
-    eta = table_eta(eta_zajezdnia01, eta_zajezdnia02)
-
-    # printing tram information table for both directions
-    outcome = [(number, direction, time_left)
-               for number, direction, time_left in zip(tram_nums, headsigns, eta)]
-    # printing n lines of data
-    outcome = [outcome[i] for i in range(5)]
-    print(tabulate(outcome, tablefmt='simple', headers='  ', numalign='right'))
+    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    for departure in departures[:5]:
+        minutes_till_departure = departure.minutes_till_departure(now)
+        print(
+            f'{departure.line_number:2d} {departure.direction:20.20s} '
+            + (f"{minutes_till_departure:2d}" if minutes_till_departure > 1
+               else ICON))
 
 
 if __name__ == '__main__':
-    # looping program every n sec
     while True:
         main()
         time.sleep(20)
