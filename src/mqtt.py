@@ -3,7 +3,7 @@ from paho.mqtt import client as mqtt_client
 
 
 class Mqtt:
-    def __init__(self, broker, port, username, password, topic, client_id):
+    def __init__(self, broker: str, port: int, username: str, password: str, topic: str, client_id: str) -> None:
         self.broker = broker
         self.port = port
         self.username = username
@@ -12,7 +12,7 @@ class Mqtt:
         self.client_id = client_id
 
     def connect_mqtt(self) -> mqtt_client:
-        def on_connect(client, userdata, flags, rc):
+        def on_connect(client, userdata, flags, rc):  # zaa wyjątkiem rc argumenty chyba niepotrzebne?
             if rc == 0:
                 print("Connected to MQTT Broker!")
             else:
@@ -24,7 +24,7 @@ class Mqtt:
         client.connect(self.broker, self.port)
         return client
 
-    def publish(self, client, payload):
+    def publish(self, client, payload) -> mqtt_client:
         result = client.publish(self.topic, payload)
         status = result[0]
         if status == 0:
@@ -32,10 +32,10 @@ class Mqtt:
         else:
             print(f"Failed to send message to topic {self.topic}")
 
-    def run(self, tram):
+    def run(self, tram) -> mqtt_client:
         client = self.connect_mqtt()
         client.loop_start()
         while True:
-            payload = tram.get_payload()
+            payload = tram.json_file()
             self.publish(client, payload)
             time.sleep(20)
