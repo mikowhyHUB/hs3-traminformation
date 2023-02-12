@@ -5,6 +5,9 @@ The project was written to be finally displayed on matrix monitors. The script t
 The data is pulled from the official Open Data API located here:
 https://ckan.multimediagdansk.pl/dataset/tristar/resource/00fbcffa-5188-45be-b300-b4da9a91c24f
 
+(https://raw.githubusercontent.com/mikowhyHUB/hs3-traminformation/main/assets/matrix_led.jpg)
+
+
 ## Features
 - Gets live data from ckan.multimediagdansk.pl
 - Shows live data 
@@ -37,4 +40,4 @@ Big thanks to:
 
 
 
-### If you have any questions, feel free to contact me :)
+
