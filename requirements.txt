@@ -13,4 +13,3 @@ setuptools~=63.2.0
 packaging~=21.3
 pyparsing~=3.0.9
 future~=0.18.2
-.
