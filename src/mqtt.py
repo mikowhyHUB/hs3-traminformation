@@ -12,7 +12,7 @@ class Mqtt:
         self.client_id = client_id
 
     def connect_mqtt(self) -> mqtt_client:
-        def on_connect(client, userdata, flags, rc):  # zaa wyjątkiem rc argumenty chyba niepotrzebne?
+        def on_connect(client, userdata, flags, rc):
             if rc == 0:
                 print("Connected to MQTT Broker!")
             else:

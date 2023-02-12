@@ -2,7 +2,7 @@ from mqtt import Mqtt
 from traminformation import TramFinder
 import random
 
-broker = '192.168.1.118'
+broker = '127.0.0.1'
 port = 1883
 topic = "feed/public_transport"
 client_id = f'python-mqtt-{random.randint(0, 100)}'
