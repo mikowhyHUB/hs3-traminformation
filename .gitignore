@@ -1,2 +1,4 @@
 .DS_Store
 mosquitto.conf
+.idea
+__pycache__
