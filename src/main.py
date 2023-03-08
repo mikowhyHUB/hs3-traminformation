@@ -1,14 +1,16 @@
-from mqtt import Mqtt
-from traminformation import TramFinder
 import random
 import os
+from mqtt import Mqtt
+from traminformation import TramFinder
+
 
 broker = os.getenv('MQTT_BROKER', '127.0.0.1')
-port = 1883
-topic = "feed/public_transport"
+port = int(os.getenv('MQTT_PORT', '1883'))
+topic = os.getenv('MQTT_TOPIC', 'feed/public_transport')
 client_id = f'python-mqtt-{random.randint(0, 100)}'
-username = ''
-password = ''
+username = os.getenv('MQTT_USERNAME', '')
+password = os.getenv('MQTT_PASSWORD', '')
+
 
 STOP_IDS: list = [2031, 2030]
 LINES_TO_SHOW: int = 5
