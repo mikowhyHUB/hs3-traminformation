@@ -10,7 +10,7 @@ ENV \
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential=12.9 \
-    curl=7.74.0-1.3+deb11u5 \
+    curl=7.74.0-1.3+deb11u7 \
     gcc=4:10.2.1-1 \
     libxml2-dev=2.9.10+dfsg-6.7+deb11u3 \
     libxslt1-dev=1.1.34-4+deb11u1 \
