@@ -4,7 +4,6 @@ import re
 import dataclasses
 import typing as t
 import datetime
-
 from requests import Response
 
 ISO8601_DATE: t.Pattern[str] = re.compile(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z$")
@@ -25,7 +24,7 @@ class TramInformation:
     def minutes_till_departure(self, now: datetime.datetime) -> int:
         now: datetime = now or datetime.datetime.utcnow()
         seconds: float = (self.eta - now).total_seconds()
-        return round(seconds / 60)
+        return abs(round(seconds / 60))
 
 
 class TramFinder:
@@ -50,7 +49,7 @@ class TramFinder:
         for departure in departures[:self.lines_to_show]:
             minutes_till_departure = departure.minutes_till_departure(now)
             departure_dict = {'n': departure.line_number, 'd': departure.direction,
-                              't': minutes_till_departure}  # moge keys zmienic by były bardziej czytelne?
+                              't': minutes_till_departure}
             list_of_dicts.append(departure_dict)
             json_dict['ztm'] = list_of_dicts
         payload = json.dumps(json_dict)
